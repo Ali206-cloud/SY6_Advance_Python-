@@ -13,3 +13,4 @@ def tab(n):
 n = int(input("Enter n: "))
 print("Memoization:", memo(n, [-1]*(n+1)))
 print("Tabulation:", tab(n))
+ 
