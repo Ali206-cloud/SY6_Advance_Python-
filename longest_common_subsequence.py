@@ -40,3 +40,4 @@ sequence, length = lcs(X, Y)
 
 print("LCS:", sequence)
 print("Length:", length)
+ 
