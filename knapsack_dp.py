@@ -1,83 +1,34 @@
-# 0/1 Knapsack - Bottom-Up and Top-Down DP
-
-# Items
-values = [60, 100, 120]
-weights = [10, 20, 30]
-capacity = 50
-
-
-# -------------------------
-# 1. Bottom-Up Approach
-# -------------------------
-def knapsack_bottom_up(weights, values, capacity):
-    n = len(weights)
-
-    # dp[i][w] = maximum value using first i items
-    # with weight capacity w
-    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
-
-    for i in range(1, n + 1):
-        for w in range(capacity + 1):
-
-            if weights[i - 1] <= w:
-                dp[i][w] = max(
-                    values[i - 1] + dp[i - 1][w - weights[i - 1]],
-                    dp[i - 1][w]
-                )
-            else:
-                dp[i][w] = dp[i - 1][w]
-
-    return dp[n][capacity]
+def bottom_up(w, v, c):
+    dp = [0] * (c + 1)
+    for i in range(len(w)):
+        for j in range(c, w[i] - 1, -1):
+            dp[j] = max(dp[j], v[i] + dp[j - w[i]])
+    return dp[c]
 
 
-# -------------------------
-# 2. Top-Down Approach
-# -------------------------
-def knapsack_top_down(weights, values, capacity):
-    n = len(weights)
+def top_down(w, v, c, memo={}):
+    if c == 0 or not w:
+        return 0
+    if (len(w), c) in memo:
+        return memo[(len(w), c)]
 
-    # Memoization table
-    memo = [[-1] * (capacity + 1) for _ in range(n + 1)]
+    if w[-1] > c:
+        ans = top_down(w[:-1], v[:-1], c, memo)
+    else:
+        ans = max(
+            v[-1] + top_down(w[:-1], v[:-1], c-w[-1], memo),
+            top_down(w[:-1], v[:-1], c, memo)
+        )
 
-    def solve(i, w):
-        # No items or no capacity
-        if i == 0 or w == 0:
-            return 0
-
-        # Already calculated
-        if memo[i][w] != -1:
-            return memo[i][w]
-
-        # If item is too heavy, don't select it
-        if weights[i - 1] > w:
-            memo[i][w] = solve(i - 1, w)
-
-        else:
-            # Maximum of selecting or not selecting the item
-            select = values[i - 1] + solve(
-                i - 1, w - weights[i - 1]
-            )
-
-            not_select = solve(i - 1, w)
-
-            memo[i][w] = max(select, not_select)
-
-        return memo[i][w]
-
-    return solve(n, capacity)
+    memo[(len(w), c)] = ans
+    return ans
 
 
-# -------------------------
-# Main Program
-# -------------------------
+# Input
+n = int(input("Number of items: "))
+w = list(map(int, input("Weights: ").split()))
+v = list(map(int, input("Values: ").split()))
+c = int(input("Capacity: "))
 
-bottom_up_result = knapsack_bottom_up(
-    weights, values, capacity
-)
-
-top_down_result = knapsack_top_down(
-    weights, values, capacity
-)
-
-print("Bottom-Up DP Result:", bottom_up_result)
-print("Top-Down DP Result:", top_down_result)
+print("Bottom-Up:", bottom_up(w, v, c))
+print("Top-Down:", top_down(w, v, c))
